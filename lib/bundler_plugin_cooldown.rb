@@ -65,5 +65,9 @@ end
 
 Bundler::Plugin.add_hook("before-install-all") do |_deps|
   puts "BundlerPluginCooldown >>>"
-  BundlerPluginCooldown.check!(Bundler.definition.resolve)
+  # Source の remote 取得を有効化してから resolve する。
+  # before-install-all は installer.run より前に走るため、ここで
+  # remotely! しないと Source は local-only モードのままで、
+  # 新規 gem の解決が "Could not find ... in locally installed gems" で失敗する。
+  BundlerPluginCooldown.check!(Bundler.definition.resolve_remotely!)
 end
