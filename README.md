@@ -32,12 +32,23 @@ Gemfile 経由の場合、**初回の `bundle install` ではフックが発火�
 
 ## 設定
 
-`lib/bundler_plugin_cooldown.rb` の定数を直接編集する。
-
-| 定数 | 既定 | 意味 |
+| 設定 | 既定 | 意味 |
 |---|---|---|
-| `COOLDOWN_DAYS` | `7` | 公開からこの日数以内の gem の install を拒否する |
-| `REQUEST_DELAY` | `0.15` | API リクエスト間のスリープ秒数（rubygems.org の上限 10 req/s に対する余裕分）|
+| `bundler_plugin_cooldown.days` (`bundle config`) | `2` | 公開からこの日数以内の gem の install を拒否する |
+| `REQUEST_DELAY` (定数) | `0.15` | API リクエスト間のスリープ秒数（rubygems.org の上限 10 req/s に対する余裕分） |
+
+`bundler_plugin_cooldown.days` の上書き例:
+
+```sh
+# プロジェクトローカル（.bundle/config に保存）
+bundle config set --local bundler_plugin_cooldown.days 14
+
+# グローバル（~/.bundle/config に保存）
+bundle config set --global bundler_plugin_cooldown.days 14
+
+# 一時的に環境変数で（Bundler の env 変換規則によりドットは __ になる）
+BUNDLE_BUNDLER_PLUGIN_COOLDOWN__DAYS=14 bundle install
+```
 
 ## 制限事項
 

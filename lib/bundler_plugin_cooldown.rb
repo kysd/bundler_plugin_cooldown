@@ -4,11 +4,16 @@ require "time"
 require "date"
 
 module BundlerPluginCooldown
-  COOLDOWN_DAYS = 2
+  DEFAULT_COOLDOWN_DAYS = 2
 
   # rubygems.org rate limit: 10 req/s
   # https://guides.rubygems.org/rubygems-org-rate-limits/
   REQUEST_DELAY = 0.15
+
+  def self.cooldown_days
+    raw = Bundler.settings["bundler_plugin_cooldown.days"]
+    raw ? Integer(raw) : DEFAULT_COOLDOWN_DAYS
+  end
 
   def self.check!(specs)
     targets = specs.select do |s|
@@ -17,6 +22,7 @@ module BundlerPluginCooldown
     end
     return if targets.empty?
 
+    days = cooldown_days
     today = Date.today
     violators = []
 
@@ -27,7 +33,7 @@ module BundlerPluginCooldown
       next unless created_at
 
       released_on = created_at.to_date
-      violators << [spec, created_at] if today < released_on + COOLDOWN_DAYS 
+      violators << [spec, created_at] if today < released_on + days
     end
 
     return if violators.empty?
@@ -37,7 +43,7 @@ module BundlerPluginCooldown
       "  - #{spec.name} #{spec.version} (published #{created_at.utc.strftime('%Y-%m-%d')}, #{age}d ago)"
     end
     raise Bundler::InstallError, <<~MSG
-      [bundler-cooldown] Refusing to install #{violators.size} gem(s) within #{COOLDOWN_DAYS}-day cooldown:
+      [bundler-cooldown] Refusing to install #{violators.size} gem(s) within #{days}-day cooldown:
       #{lines.join("\n")}
     MSG
   end
