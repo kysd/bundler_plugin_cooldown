@@ -3,6 +3,8 @@
 公開から一定期間（cooldown）が経過していない gem version の install を抑止する Bundler プラグイン。maintainer アカウントの乗っ取り等で悪意あるコードが publish された場合に、推移依存経由で即時に取り込まれる事故を緩和することを目的とする。
 
 > ⚠️ **本プラグインは PoC (Proof of Concept) 実装である。動作保証は無く、仕様および挙動は予告なく変更され得る。本番環境や CI への組み込みは自己責任で行うこと。**
+>
+> **📌 Bundler 4.0.13 以降は公式の cooldown 機能が利用可能になった。** Gemfile の `source` 行に `cooldown:` オプションを指定するだけで同等の保護が得られる（例: `source "https://rubygems.org", cooldown: 7`）。新規プロジェクトでは本プラグインではなく公式機能の使用を推奨する。
 
 ## 動作
 
